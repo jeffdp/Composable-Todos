@@ -9,11 +9,17 @@
 import SwiftUI
 import ComposableArchitecture
 
-struct AppState {
-    
+struct Todo: Equatable, Identifiable {
+    let id: UUID
+    var description = ""
+    var isComplete = false
 }
 
-enum AppAction {
+struct AppState: Equatable {
+    var todos: [Todo]
+}
+
+enum AppAction: Equatable {
     
 }
 
@@ -32,17 +38,33 @@ struct ContentView: View {
     
     var body: some View {
         NavigationView {
-            List {
-                Text("Hello")
+            WithViewStore(self.store) { viewStore in
+                List {
+                    ForEach(viewStore.todos) { todo in
+                        Text(todo.description)
+                    }
+                }
+            .navigationBarTitle("Todos")
             }
-        .navigationBarTitle("Todos")
         }
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
+    static let mockTodos = [
+        Todo(id: UUID(),
+             description: "Whiskey",
+                 isComplete: false),
+        Todo(id: UUID(),
+             description: "Bourbon",
+             isComplete: false),
+        Todo(id: UUID(),
+             description: "Beer",
+             isComplete: false),
+    ]
+    
     static var previews: some View {
-        ContentView(store: Store(initialState: AppState(),
+        ContentView(store: Store(initialState: AppState(todos: mockTodos),
                                  reducer: appReducer,
                                  environment: AppEnvironment()))
     }
