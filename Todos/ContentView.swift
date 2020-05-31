@@ -59,10 +59,8 @@ struct ContentView: View {
         NavigationView {
             WithViewStore(self.store) { viewStore in
                 List {
-					ForEachStore(self.store.scope(state: { $0.todos },
-												  action: { AppAction.todo(index: $0, action: $1) })) { todoStore in
-						TodoView(store: todoStore)
-					}
+					ForEachStore(self.store.scope(state: \.todos, action: AppAction.todo(index:action:)),
+								 content: TodoView.init(store:))
                 }
 				.navigationBarTitle("Todos")
             }
@@ -81,10 +79,8 @@ struct TodoView: View {
 				}
 				.buttonStyle(PlainButtonStyle())
 				
-				TextField("Untitled todo", text: todoViewStore.binding(
-					get: { $0.description },
-					send: { .textFieldChanged($0) }
-				))
+				TextField("Untitled todo",
+						  text: todoViewStore.binding(get: \.description, send: TodoAction.textFieldChanged))
 			}
 			.foregroundColor(todoViewStore.isComplete ? .gray : nil)
 		}
